@@ -4,13 +4,13 @@
 
 ## 1. Thông tin học viên
 
-- **Họ và tên:**
-- **MSSV:**
+- **Họ và tên:** Nguyễn Thị Chinh
+- **MSSV:** 2A202602876
 - **Lớp:** K4-L3A
-- **Repository URL:**
+- **Repository URL:** https://github.com/chinhnt0110/K4-L3-DAY13-NguyenThiChinh-2A202602876-Monitoring-LLMOps
 - **Commit SHA cuối:**
 - **Challenge ID:**
-- **Tên project Langfuse cá nhân:** `day13-k4-l3a-<MSSV>`
+- **Tên project Langfuse cá nhân:** `day13-k4-l3a-2A202602876`
 
 ## 2. Evidence index
 
@@ -37,13 +37,13 @@
 
 | Nội dung | Baseline | Kết quả cuối | Nhận xét |
 |---|---|---|---|
-| `validate_logs.py` | | | |
-| `validate_dashboard.py` | | | |
-| `pytest` | | | |
-| Số traces hợp lệ | | | |
-| Số PII leak | | | |
-| Latency P95 / TTFT P95 | | | |
-| Retrieval success rate | | | |
+| `validate_logs.py` | 30/100 | 100/100 | |
+| `validate_dashboard.py` | HỢP LỆ: 6/6 panel có trong dashboard contract | | |
+| `pytest` | 22 passed in 1.01s | | |
+| Số traces hợp lệ | 0 | | |
+| Số PII leak | 0 | | |
+| Latency P95 / TTFT P95 | 4011ms / 55ms| | |
+| Retrieval success rate | 100% | | |
 
 ## 4. Logging và PII
 
@@ -58,7 +58,7 @@
 - **Cấu trúc root/retrieval/generation observations:**
 - **Cách nối trace với log:**
 - **Prompt name:**
-- **Version/label baseline:**
+- **Version/label baseline:** 
 - **Version/label candidate:**
 - **Trace ID của mỗi version:**
 - **Cách promote và rollback `production`:**
@@ -100,3 +100,32 @@
 - [ ] Repository chạy lại được theo README.
 - [ ] Không có secret, API key, PII thô hoặc evidence của người khác/lớp khác.
 - [ ] URL repo và commit SHA cuối đã được nộp trên LMS/Codelabs.
+
+
+[200] MISSING | qa | 991.3ms
+[200] MISSING | qa | 410.7ms
+[200] MISSING | summary | 462.3ms
+[200] MISSING | qa | 415.8ms
+[200] MISSING | qa | 437.7ms
+[200] MISSING | summary | 431.8ms
+[200] MISSING | qa | 412.9ms
+[200] MISSING | qa | 409.0ms
+[200] MISSING | qa | 414.7ms
+[200] MISSING | qa | 417.9ms
+--- Lab Verification Results ---
+Total log records analyzed: 42
+Records with missing required fields: 40
+Records with missing enrichment (context): 40
+Unique correlation IDs found: 0
+Potential PII leaks detected: 0
+
+--- Grading Scorecard (Estimates) ---
+- [FAILED] Missing required fields (ts, level, etc.)
+- [FAILED] Correlation ID propagation (less than 2 unique IDs)
+- [FAILED] Log enrichment (missing user_id_hash, etc.)
++ [PASSED] PII scrubbing
+
+Estimated Score: 30/100
+HỢP LỆ: 6/6 panel có trong dashboard contract.
+......................                                                                         [100%]
+22 passed in 0.91s
