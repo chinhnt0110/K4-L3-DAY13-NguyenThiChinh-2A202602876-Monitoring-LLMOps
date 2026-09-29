@@ -1,11 +1,12 @@
 from __future__ import annotations
+from .mock_llm import FakeLLM, FakeResponse
+from typing import Any
 
 import os
 import time
 from dataclasses import dataclass
 
 from . import metrics
-from .mock_llm import FakeLLM
 from .mock_rag import retrieve
 from .pii import hash_user_id, summarize_text
 from .prompt_management import resolve_prompt
@@ -51,7 +52,7 @@ class LabAgent:
             },
         ):
             started = time.perf_counter()
-            docs = retrieve(message)
+            docs = self._observe_retrieve(message)
             prompt = resolve_prompt(
                 langfuse_client,
                 feature=feature,
@@ -71,13 +72,11 @@ class LabAgent:
                 },
                 version=prompt.version,
             )
-            # TODO (CP2): instrument retrieve() and FakeLLM.generate() as child
-            # observations. The nested generation must receive prompt, usage and cost.
-            with propagate_attributes(prompt=prompt.managed_prompt):
-                response = self.llm.generate(prompt.text)
+            response, cost_usd = self._observe_generate(
+                prompt.text, prompt.managed_prompt
+            )
             quality_score = self._heuristic_quality(message, response.text, docs)
             latency_ms = int((time.perf_counter() - started) * 1000)
-            cost_usd = self._estimate_cost(response.usage.input_tokens, response.usage.output_tokens)
 
         metrics.record_request(
             latency_ms=latency_ms,
@@ -98,6 +97,39 @@ class LabAgent:
             quality_score=quality_score,
         )
 
+    @observe(name="retrieval", as_type="retriever")
+    def _observe_retrieve(self, message: str) -> list[str]:
+        return retrieve(message)
+        
+    @observe(name="generation", as_type="generation")
+    def _observe_generate(
+        self, prompt_text: str, managed_prompt: Any
+    ) -> tuple[FakeResponse, float]:
+        # 1. Báo cho Langfuse biết version của prompt thông qua managed_prompt
+        with propagate_attributes(prompt=managed_prompt):
+            # 2. Đưa nội dung text thuần cho LLM xử lý
+            response = self.llm.generate(prompt_text)
+
+        # 3. Tính chi phí và cập nhật cho Langfuse
+        cost_usd = self._estimate_cost(
+            response.usage.input_tokens, response.usage.output_tokens
+        )
+        client = get_langfuse_client()
+        if hasattr(client, "update_current_generation"):
+            client.update_current_generation(
+                model=self.model,
+                input=prompt_text,
+                output=response.text,
+                usage_details={
+                    "input": response.usage.input_tokens,
+                    "output": response.usage.output_tokens,
+                    "total": response.usage.input_tokens + response.usage.output_tokens,
+                },
+                cost_details={"total": cost_usd},
+            )
+        return response, cost_usd
+
+        
     def _estimate_cost(self, tokens_in: int, tokens_out: int) -> float:
         input_cost = (tokens_in / 1_000_000) * 3
         output_cost = (tokens_out / 1_000_000) * 15
