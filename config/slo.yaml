@@ -3,11 +3,11 @@ primary_slo:
   name: fast_successful_requests
   window: 28d
   sli:
-    good_event: 'event == "response_sent" and latency_ms <= 3000'
+    good_event: 'event == "response_sent" and latency_ms <= 2000'
     total_event: 'event == "request_received"'
-  target_percent: 99.5
-  error_budget_percent: 0.5
-  note: Học viên phải giải thích hoặc điều chỉnh ngưỡng bằng baseline của mình.
+  target_percent: 99.0
+  error_budget_percent: 1.0
+  note: Dựa trên baseline latency P95 bình thường ~464ms, ngưỡng latency 2000ms bảo đảm trải nghiệm người dùng không bị gián đoạn. Error budget 1.0% trong 28 ngày tương đương với tối đa 100 requests bị chậm/lỗi trên mỗi 10,000 requests.
 guardrails:
   error_rate_pct_max: 2
   daily_cost_usd_max: 2.5

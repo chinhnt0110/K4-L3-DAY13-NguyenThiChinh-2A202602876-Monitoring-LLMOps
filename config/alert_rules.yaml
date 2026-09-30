@@ -1,25 +1,25 @@
 alerts:
-  - name: TODO_alert_1
-    severity: TODO
-    condition: TODO
-    duration: TODO
+  - name: HighLatencyP95Breached
+    severity: P1
+    condition: 'latency_p95_ms > 2000'
+    duration: 3m
     type: symptom-based
-    channel: slack
-    owner: TODO
+    channel: '#alerts-prod'
+    owner: on-call-sre
     runbook: docs/alerts.md#alert-1
-  - name: TODO_alert_2
-    severity: TODO
-    condition: TODO
-    duration: TODO
+  - name: HighApiErrorRate
+    severity: P1
+    condition: 'error_rate_pct > 5'
+    duration: 5m
     type: symptom-based
-    channel: slack
-    owner: TODO
+    channel: '#alerts-prod'
+    owner: backend-lead
     runbook: docs/alerts.md#alert-2
-  - name: TODO_alert_3
-    severity: TODO
-    condition: TODO
-    duration: TODO
+  - name: DailyCostSpikeDetected
+    severity: P2
+    condition: 'daily_cost_usd > 2.5 or cost_burn_rate > 0.5'
+    duration: 15m
     type: symptom-based
-    channel: slack
-    owner: TODO
+    channel: '#alerts-cost'
+    owner: llmops-lead
     runbook: docs/alerts.md#alert-3
